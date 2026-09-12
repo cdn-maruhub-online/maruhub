@@ -1,37 +1,13 @@
 --[[
-    Blox Fruits / Roblox Anti-Kick Bypass Script
-    專門用於攔截並防止腳本或伺服器將你踢出遊戲（Kick）
+    Auto Kick & Ban Message Script
 ]]--
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- 攔截並保護 __namecall，使所有 Kick / kick 呼叫失效
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod()
-    local args = {...}
-    
-    -- 檢查是否為玩家本身的 Kick 或小寫 kick 請求
-    if self == LocalPlayer and (method == "Kick" or method == "kick") then
-        print("【成功攔截】偵測到腳本嘗試將你踢出遊戲，已強制阻擋！")
-        -- 回傳空值，直接阻斷踢出指令，不執行任何動作
-        return nil
+task.spawn(function()
+    task.wait(0.5)
+    if LocalPlayer then
+        LocalPlayer:Kick("You have been permanently banned.")
     end
-    
-    return oldNamecall(self, ...)
 end)
-
--- 同時對普通方法呼叫（如 player:Kick()）進行保護
-local oldIndex
-oldIndex = hookmetamethod(game, "__index", function(self, idx)
-    if self == LocalPlayer and idx == "Kick" then
-        return function()
-            print("【成功攔截】攔截到 Kick 函式調用，已略過。")
-            return nil
-        end
-    end
-    return oldIndex(self, idx)
-end)
-
-print("防踢出保護已成功啟動！")
